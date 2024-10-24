@@ -5,9 +5,9 @@ class Asset():
     def __init__(self, symbol: str):
         self.symbol = symbol
         self.ticker = yf.Ticker(symbol)
-        self.data = yf.download(symbol)
-        self.pd_prices = self.data["Adj Close"]
-        self.pd_returns = self.data["Adj Close"].pct_change()
+        self.raw_data = yf.download(symbol)
+        self.pd_prices = self.raw_data["Adj Close"]
+        self.pd_returns = self.raw_data["Adj Close"].pct_change()
     
     def get_prices(self) -> np.ndarray:
         return self.pd_prices.to_numpy().flatten()
@@ -31,9 +31,8 @@ class TreasuryBill(Asset):
         return self.get_prices()     
 
 
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     stock = Asset("^FVX")
-    data = stock.data
-    print(data)
-    print(data.isnull().sum())
-    print(stock._get_returns())
+    data = stock.raw_data
+    print(data.index[0])
+    print(data.loc()) """
