@@ -1,19 +1,7 @@
 from utils import align_data_from_time, get_excess_returns
-from assets import Stock, TreasuryBill, Asset
+from assets import Stock, TreasuryBill, Asset, Periodicity
 import numpy as np
 import matplotlib.pyplot as plt
-from enum import Enum
-
-
-class Periodicity(Enum):
-    MONTHLY = "ME", 1/12
-    QUATERLY = "3ME", 3/12
-    SEMI_ANNUALLY = "6ME", 1/2
-    ANNUALLY = "YE", 1
-
-    def __init__(self, alias, nbr):
-        self.alias = alias
-        self.nbr = nbr
 
 
 # Estimate Beta with an unique risk-free rate.
@@ -31,7 +19,7 @@ def estimate_beta(asset: Asset, market: Asset, treasury_bill: TreasuryBill, peri
     asset_data, mkt_data, tb_data = align_data_from_time([asset.raw_data, market.raw_data, treasury_bill.raw_data])
     
     # Calculte the risk-free rate(s)
-    rf_rates = treasury_bill.get_periodic_rf_rate(tb_data, periodicity.alias)
+    rf_rates = treasury_bill.get_periodic_rf_rate(tb_data, periodicity)
     # Calculate the excess returns over the risk-free rate(s).
     stock_excess_returns = get_excess_returns(asset.get_periodic_returns(asset_data, periodicity.alias), rf_rates)
     mkt_excess_returns = get_excess_returns(market.get_periodic_returns(mkt_data, periodicity.alias), rf_rates)
@@ -47,8 +35,8 @@ if __name__ == "__main__":
     stock = Stock("AAPL")
     market = Stock("^GSPC")
     treasury_bill = TreasuryBill("^IRX")
-    stock_excess_returns, mkt_escess_returns, param = estimate_beta(stock, market, treasury_bill, Periodicity.ANNUALLY)
-    #stock_excess_returns, mkt_escess_returns, param = estimate_beta(stock, market, treasury_bill, Periodicity.QUATERLY)
+    #stock_excess_returns, mkt_escess_returns, param = estimate_beta(stock, market, treasury_bill, Periodicity.ANNUALLY)
+    stock_excess_returns, mkt_escess_returns, param = estimate_beta(stock, market, treasury_bill, Periodicity.QUATERLY)
 
     fig, ax = plt.subplots(figsize=(9, 9))
     ax.scatter(mkt_escess_returns, stock_excess_returns, s=60, alpha=0.7, edgecolors="k")
